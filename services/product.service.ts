@@ -2,9 +2,7 @@ import Product from "../entities/product.entity";
 import ProductRepository from "../repositories/product.repository";
 
 class ProductService {
-  constructor(private productRepository: ProductRepository) {
-
-  }
+  constructor(private productRepository: ProductRepository) {}
 
   async getProducts() {
     return this.productRepository.getAll();

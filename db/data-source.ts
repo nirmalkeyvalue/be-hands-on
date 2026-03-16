@@ -3,6 +3,7 @@ import path from "path";
 import { DataSource } from "typeorm";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 import Product from "../entities/product.entity";
+import User from "../entities/user.entity";
 import 'dotenv/config'
 
 if (!process.env.DB_HOST || !process.env.DB_PORT || !process.env.DB_NAME || !process.env.DB_USER || !process.env.DB_PASSWORD) {
@@ -20,7 +21,7 @@ const dataSource = new DataSource({
   synchronize: false,
   logging: true,
   namingStrategy: new SnakeNamingStrategy(),
-  entities: [Product],
+  entities: [Product, User],
   migrations: [
     path.join(
       __dirname,
