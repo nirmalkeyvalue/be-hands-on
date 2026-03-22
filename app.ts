@@ -2,8 +2,11 @@ import express from "express";
 import "reflect-metadata";
 import dotenv from "dotenv";
 import dataSource from "./db/data-source";
+import HttpException from "./exception/http.exception";
 import productRouter from "./routes/product.routes";
 import authRouter from "./routes/auth.routes";
+import authenticationMiddleware from "./middlewares/authenticationMiddleware";
+import orderRouter from "./routes/order.routes";
 
 dotenv.config();
 
@@ -19,8 +22,26 @@ server.get("/health", (req, res) => {
     await dataSource.initialize();
     console.log("Database connected");
 
-    server.use("/products", productRouter);
+    server.use("/products", authenticationMiddleware, productRouter);
+    server.use("/orders", authenticationMiddleware, orderRouter);
     server.use("/auth", authRouter);
+
+    server.use(
+      (
+        err: unknown,
+        _req: express.Request,
+        res: express.Response,
+        _next: express.NextFunction
+      ) => {
+        if (err instanceof HttpException) {
+          res.status(err.status).json({ message: err.message });
+          return;
+        }
+        console.error(err);
+        res.status(500).json({ message: "Internal server error" });
+      }
+    );
+
     server.listen(process.env.PORT, () => {
       console.log(`Server running on http://localhost:${process.env.PORT}`);
     });

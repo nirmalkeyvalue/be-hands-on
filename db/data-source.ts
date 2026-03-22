@@ -2,6 +2,8 @@ import "reflect-metadata";
 import path from "path";
 import { DataSource } from "typeorm";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
+import Order from "../entities/order.entity";
+import OrderItem from "../entities/orderitem.entity";
 import Product from "../entities/product.entity";
 import User from "../entities/user.entity";
 import 'dotenv/config'
@@ -21,7 +23,7 @@ const dataSource = new DataSource({
   synchronize: false,
   logging: true,
   namingStrategy: new SnakeNamingStrategy(),
-  entities: [Product, User],
+  entities: [Order, OrderItem, Product, User],
   migrations: [
     path.join(
       __dirname,

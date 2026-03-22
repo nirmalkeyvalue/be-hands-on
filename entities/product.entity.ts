@@ -1,5 +1,6 @@
-import {Column, Entity } from "typeorm";
+import {Column, Entity, OneToMany } from "typeorm";
 import AbstractEntity from "./abstract.entity";
+import OrderItem from "./orderitem.entity";
 
 @Entity()
 class Product extends AbstractEntity {
@@ -9,8 +10,11 @@ class Product extends AbstractEntity {
   @Column()
   description!: string;
 
-  @Column()
+  @Column({ type: "real" })
   price!: number;
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
+  items!: OrderItem[];
 }
 
 export default Product;
