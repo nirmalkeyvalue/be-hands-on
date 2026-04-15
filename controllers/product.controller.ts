@@ -1,5 +1,8 @@
 import express from "express";
+import { CreateProductDto } from "../dto/product/create-product.dto";
+import Product from "../entities/product.entity";
 import ProductService from "../services/product.service";
+import { validateDto } from "../utils/validate-dto";
 
 export class ProductController {
   router: express.Router;
@@ -17,7 +20,12 @@ export class ProductController {
   };
 
   public createProduct = async (req: express.Request, res: express.Response) => {
-    const product = await this.productService.createProduct(req.body);
-    res.status(201).json({ data: product });
+    const dto = await validateDto(CreateProductDto, req.body);
+    const product = new Product();
+    product.name = dto.name;
+    product.description = dto.description;
+    product.price = dto.price;
+    const created = await this.productService.createProduct(product);
+    res.status(201).json({ data: created });
   };
 }

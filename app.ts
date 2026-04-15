@@ -2,7 +2,8 @@ import express from "express";
 import "reflect-metadata";
 import dotenv from "dotenv";
 import dataSource from "./db/data-source";
-import HttpException from "./exception/http.exception";
+import errorMiddleware from "./middlewares/errorMiddleware";
+import requestLogger from "./middlewares/requestLogger";
 import productRouter from "./routes/product.routes";
 import authRouter from "./routes/auth.routes";
 import authenticationMiddleware from "./middlewares/authenticationMiddleware";
@@ -12,6 +13,7 @@ dotenv.config();
 
 const server = express();
 server.use(express.json());
+server.use(requestLogger);
 
 server.get("/health", (req, res) => {
   return res.json({ message: "OK" });
@@ -26,21 +28,7 @@ server.get("/health", (req, res) => {
     server.use("/orders", authenticationMiddleware, orderRouter);
     server.use("/auth", authRouter);
 
-    server.use(
-      (
-        err: unknown,
-        _req: express.Request,
-        res: express.Response,
-        _next: express.NextFunction
-      ) => {
-        if (err instanceof HttpException) {
-          res.status(err.status).json({ message: err.message });
-          return;
-        }
-        console.error(err);
-        res.status(500).json({ message: "Internal server error" });
-      }
-    );
+    server.use(errorMiddleware);
 
     server.listen(process.env.PORT, () => {
       console.log(`Server running on http://localhost:${process.env.PORT}`);
